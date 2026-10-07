@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sciviz"
+version = "0.1.0"
+description = "A small toolkit for loading, analyzing and visualizing scientific/experimental data."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Zhubanysh Burlibayev" }]
+dependencies = [
+    "pandas>=1.5",
+    "matplotlib>=3.5",
+    "numpy>=1.23",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov>=4.0", "flake8>=6.0"]
+
+[project.scripts]
+sciviz = "sciviz.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.flake8]
+max-line-length = 100
+exclude = [".git", "__pycache__", "build", "dist"]
