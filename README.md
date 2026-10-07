@@ -5,23 +5,23 @@
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
 
 A small, dependency-light Python toolkit for **loading, statistically summarizing, and
-visualizing experimental / scientific data** exported as CSV — the kind of quick
+visualizing experimental / scientific data** exported as CSV - the kind of quick
 plot-and-describe workflow that comes up constantly when processing lab measurements,
 simulation output, or survey data.
 
-Built as the practical part of *Assignment 3 — Software Development and Integration*
+Built as the practical part of *Assignment 3 - Software Development and Integration*
 (version control, CI/CD, and scientific-software best practices).
 
 ## Features
 
-- **`sciviz.stats`** — descriptive statistics (mean, std, median, min/max, 95% confidence
+- **`sciviz.stats`** - descriptive statistics (mean, std, median, min/max, 95% confidence
   interval) for a numeric column, robust to missing/non-numeric values.
-- **`sciviz.plotting`** — publication-style plots with a headless (`Agg`) matplotlib
+- **`sciviz.plotting`** - publication-style plots with a headless (`Agg`) matplotlib
   backend, so they also run in CI without a display:
   - histogram
   - scatter plot with an optional linear trendline
   - line plot with vertical error bars
-- **`sciviz.cli`** — a small command-line interface wrapping both of the above.
+- **`sciviz.cli`** - a small command-line interface wrapping both of the above.
 
 ## Example output
 
@@ -109,16 +109,16 @@ request to `main`, across Python 3.9, 3.10 and 3.11, followed by a package build
 
 ## Why these technologies
 
-- **Python** — the de-facto standard for scientific computing, with mature, well-tested
+- **Python** - the de-facto standard for scientific computing, with mature, well-tested
   libraries for exactly this kind of task.
-- **pandas** — robust CSV parsing and column-wise numeric coercion, tolerant of messy
+- **pandas** - robust CSV parsing and column-wise numeric coercion, tolerant of messy
   real-world data (missing values, stray strings).
-- **matplotlib** (`Agg` backend) — the most widely used plotting library in the
+- **matplotlib** (`Agg` backend) - the most widely used plotting library in the
   scientific Python stack; the non-interactive backend lets plots render identically on
   a laptop and in a headless CI runner.
-- **pytest** — concise test syntax, fixtures, and `pytest-cov` for coverage reporting.
-- **flake8** — fast, low-friction style/lint checking, configured via `.flake8`.
-- **GitHub Actions** — CI configuration lives next to the code, needs no external
+- **pytest** - concise test syntax, fixtures, and `pytest-cov` for coverage reporting.
+- **flake8** - fast, low-friction style/lint checking, configured via `.flake8`.
+- **GitHub Actions** - CI configuration lives next to the code, needs no external
   service setup, and is free for public repositories.
 
 ## Continuous Integration / Continuous Delivery
@@ -140,7 +140,7 @@ Assignment 3. Implementing it end-to-end (package layout, tests, linting, CI) su
 few practical lessons:
 
 - Setting `matplotlib.use("Agg")` *before* importing `pyplot` is required for plotting
-  code to run in a headless CI environment — easy to miss until the first CI run fails.
+  code to run in a headless CI environment - easy to miss until the first CI run fails.
 - Keeping `src/` layout (rather than a flat package at the repo root) avoids accidentally
   importing an uninstalled local copy of the package during testing.
 - A small, config-driven lint step (`.flake8`) catches real formatting issues early and
