@@ -1,59 +1,52 @@
 import json
 
-import pandas as pd
 import pytest
 
-from sciviz.cli import main
+from adaptive_engine.cli import main
 
 
 @pytest.fixture
-def sample_csv(tmp_path):
-    df = pd.DataFrame({
-        "time_s": [0, 1, 2, 3, 4],
-        "measurement": [5.1, 7.2, 9.0, 10.8, 13.1],
-        "measurement_err": [0.4, 0.5, 0.3, 0.6, 0.4],
-    })
-    path = tmp_path / "sample.csv"
-    df.to_csv(path, index=False)
+def item_bank_csv(tmp_path):
+    rows = ["item_id,domain,a,b"]
+    b_values = [-3.0 + 0.3 * i for i in range(21)]
+    for i, b in enumerate(b_values):
+        rows.append(f"item_{i},reasoning,1.3,{round(b, 2)}")
+    path = tmp_path / "bank.csv"
+    path.write_text("\n".join(rows))
     return str(path)
 
 
-def test_cli_stats_prints_json(sample_csv, capsys):
-    exit_code = main(["stats", sample_csv, "--column", "measurement"])
-    assert exit_code == 0
-    output = json.loads(capsys.readouterr().out)
-    assert output["n"] == 5
-    assert output["mean"] == pytest.approx(9.04)
-
-
-def test_cli_plot_histogram(sample_csv, tmp_path, capsys):
-    out_path = tmp_path / "hist.png"
+def test_cli_simulate_prints_valid_json(item_bank_csv, capsys):
     exit_code = main([
-        "plot", sample_csv, "--kind", "histogram",
-        "--column", "measurement", "--output", str(out_path),
+        "simulate", "--items", item_bank_csv, "--true-theta", "1.0",
+        "--rounds", "10", "--seed", "42",
     ])
     assert exit_code == 0
-    assert out_path.exists()
-    assert "Saved plot to" in capsys.readouterr().out
+    captured = capsys.readouterr().out
+    summary = json.loads(captured)
+    assert summary["rounds"] == 10
+    assert summary["true_theta"] == 1.0
+    assert "final_theta_estimate" in summary
+    assert "total_xp" in summary
 
 
-def test_cli_plot_scatter(sample_csv, tmp_path):
-    out_path = tmp_path / "scatter.png"
+def test_cli_simulate_with_plot(item_bank_csv, tmp_path):
+    out_path = tmp_path / "convergence.png"
     exit_code = main([
-        "plot", sample_csv, "--kind", "scatter",
-        "--x", "time_s", "--y", "measurement", "--output", str(out_path),
+        "simulate", "--items", item_bank_csv, "--true-theta", "0.5",
+        "--rounds", "8", "--seed", "1", "--plot", str(out_path),
     ])
     assert exit_code == 0
     assert out_path.exists()
 
 
-def test_cli_plot_line_requires_yerr(sample_csv, tmp_path):
-    out_path = tmp_path / "line.png"
-    with pytest.raises(SystemExit):
-        main(["plot", sample_csv, "--kind", "line",
-              "--x", "time_s", "--y", "measurement", "--output", str(out_path)])
+def test_cli_item_bank_plot(item_bank_csv, tmp_path):
+    out_path = tmp_path / "bank.png"
+    exit_code = main(["item-bank-plot", "--items", item_bank_csv, "--output", str(out_path)])
+    assert exit_code == 0
+    assert out_path.exists()
 
 
-def test_cli_stats_unknown_column_raises(sample_csv):
-    with pytest.raises(KeyError):
-        main(["stats", sample_csv, "--column", "does_not_exist"])
+def test_cli_simulate_rejects_too_many_rounds(item_bank_csv):
+    with pytest.raises(ValueError):
+        main(["simulate", "--items", item_bank_csv, "--true-theta", "0.0", "--rounds", "9999"])

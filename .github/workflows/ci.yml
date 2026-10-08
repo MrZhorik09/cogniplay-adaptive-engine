@@ -35,7 +35,7 @@ jobs:
         run: flake8 src tests
 
       - name: Run tests with coverage
-        run: pytest --cov=sciviz --cov-report=term-missing
+        run: pytest --cov=adaptive_engine --cov-report=term-missing
 
   build-check:
     name: Package build check
