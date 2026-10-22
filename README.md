@@ -153,6 +153,21 @@ request to `main`, across Python 3.9, 3.10 and 3.11, followed by a package build
 - **GitHub Actions** - CI configuration lives next to the code, needs no external service
   setup, and is free for public repositories.
 
+## Docker
+
+The project is containerized (see [`Dockerfile`](Dockerfile)). Build and run it locally:
+
+```bash
+docker build -t cogniplay-adaptive-engine .
+docker run --rm cogniplay-adaptive-engine simulate \
+    --items data/sample_item_bank.csv --true-theta 1.2 --rounds 30 --seed 7
+```
+
+The image is based on `python:3.11-slim`, installs the package via `pip install .`,
+bundles the sample item bank, and runs as a non-root user. The CLI is set as the
+container's entrypoint, so any `adaptive_engine.cli` subcommand can be passed directly to
+`docker run`.
+
 ## Continuous Integration / Continuous Delivery
 
 See [`.github/workflows/ci.yml`](.github/workflows/ci.yml). On every push and pull
@@ -162,6 +177,10 @@ request to `main`, the pipeline:
 2. Lints the code with `flake8`.
 3. Runs the full `pytest` suite (34 tests) with coverage reporting.
 4. Builds the distributable package (`python -m build`) as a final sanity check.
+5. Builds the Docker image and smoke-tests it by running a real adaptive session inside
+   the container (`docker` job). Optionally logs in and pushes the image to Docker Hub
+   if `DOCKERHUB_USERNAME` / `DOCKERHUB_TOKEN` repository secrets are configured
+   (skipped otherwise - no Docker Hub account is set up for this project currently).
 
 Pipeline runs: **https://github.com/MrZhorik09/cogniplay-adaptive-engine/actions**
 
